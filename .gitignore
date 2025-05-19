@@ -1,0 +1,44 @@
+# Python virtual environment
+.venv/
+venv/
+ENV/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+Google Chrome for Testing.app/
+PrivacySandboxAttestationsPreloaded/
+*.zip
+*.csv
+outputs/
+data/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+notebooks/
+
+# Logs
+*.log 
