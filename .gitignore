@@ -30,15 +30,28 @@ Thumbs.db
 
 # Project specific
 Google Chrome for Testing.app/
+Google Chrome for Testing.app/**/*
 PrivacySandboxAttestationsPreloaded/
+PrivacySandboxAttestationsPreloaded/**/*
 *.zip
 *.csv
 outputs/
+outputs/**/*
 data/
+data/**/*
+notebooks/
+notebooks/**/*
 
 # Jupyter Notebook
 .ipynb_checkpoints
-notebooks/
+*.ipynb_checkpoints/
 
 # Logs
-*.log 
+*.log
+
+# Large files
+*.dat
+*.bin
+*.pak
+*.dylib
+*.framework/ 
