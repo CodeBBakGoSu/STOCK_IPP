@@ -24,15 +24,18 @@ os.environ["JAVA_HOME"] = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Cont
 warnings.filterwarnings('ignore')
 
 class NewsAnalyzer:
-    def __init__(self, csv_path):
+    def __init__(self, csv_path=None):
         """
         뉴스 분석 클래스 초기화
         
         Args:
-            csv_path (str): CSV 파일 경로
+            csv_path (str, optional): CSV 파일 경로. 기본값 None.
         """
         self.csv_path = csv_path
-        self.df = self._load_data()
+        if csv_path:
+            self.df = self._load_data()
+        else:
+            self.df = pd.DataFrame() # 빈 데이터프레임으로 초기화
         
         # 폰트 설정 - 한글 출력을 위한 설정
         if platform.system() == 'Darwin':  # macOS
@@ -213,6 +216,58 @@ class NewsAnalyzer:
         except Exception as e:
             print(f"감성 분석 중 오류 발생: {e}")
             return {'positive': 0.0, 'negative': 0.0, 'neutral': 0.0}
+
+    def extract_keywords_llm_mock(self, text, top_n=5):
+        """
+        [시뮬레이션] LLM을 이용한 키워드 추출을 흉내 냅니다.
+        실제 LLM API를 호출하지 않습니다. Okt를 사용하여 명사를 추출하거나 간단한 분리를 사용합니다.
+        LLM은 일반적으로 점수를 반환하지 않으므로, 여기서는 임의의 점수(1.0)를 부여합니다.
+        Args:
+            text (str): 키워드를 추출할 텍스트
+            top_n (int): 추출할 키워드 수 (시뮬레이션에서는 근사치)
+        Returns:
+            list: (키워드, 가상_점수) 튜플의 리스트
+        """
+        print("[MOCK] LLM-based keyword extraction simulation running...")
+        keywords = []
+        if not text.strip():
+            return []
+
+        try:
+            if self.okt:
+                # Okt를 사용하여 명사 위주로 추출
+                nouns = self.okt.nouns(text)
+                # 중복 제거 및 순서 유지
+                unique_nouns = list(dict.fromkeys(nouns))
+                # 길이가 2 이상인 명사만 선택
+                filtered_nouns = [n for n in unique_nouns if len(n) > 1]
+                keywords = [(noun, 1.0) for noun in filtered_nouns[:top_n]]
+            
+            if not keywords:
+                # Okt가 없거나 명사 추출 결과가 없는 경우, 공백 기준 분리 후 상위 N개 단어 사용
+                words = text.split()
+                # 중복 제거 및 순서 유지
+                unique_words = list(dict.fromkeys(words))
+                # 간단한 필터링 (예: 너무 짧은 단어 제외)
+                filtered_words = [w for w in unique_words if len(w) > 1]
+                keywords = [(word, 1.0) for word in filtered_words[:top_n]]
+            
+            # 만약 아무 키워드도 없다면, 원문에서 처음 몇 단어라도...
+            if not keywords and len(text.split()) > 0:
+                first_few_words = text.split()[:top_n]
+                keywords = [(word, 0.5) for word in first_few_words] # 점수를 다르게 표시
+
+        except Exception as e:
+            print(f"[MOCK] LLM keyword extraction simulation error: {e}")
+            # 오류 발생 시, 텍스트의 첫 단어라도 반환 시도
+            try:
+                words = text.split()
+                if words:
+                    keywords = [(words[0], 0.1)]
+            except:
+                keywords = [("오류", 0.0)]
+
+        return keywords
 
     def find_similar_news(self, index, top_n=3):
         """
